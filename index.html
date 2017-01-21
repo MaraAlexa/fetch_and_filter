@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ajax - work with data</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="Search for a country code">
+    <ul class="matchedCountries">
+      <li>Filter</li>
+
+    </ul>
+  </form>
+<script>
+
+// some json data that have this values: [{"name":"Israel","dial_code":"+972","code":"IL"},{..}]; 242 countries
+const dataEndpoint = 'https://gist.githubusercontent.com/Goles/3196253/raw/9ca4e7e62ea5ad935bb3580dc0a07d9df033b451/CountryCodes.json';
+
+const countries = []; // this gets all the cleandata from the dataEndpoint => Array[242]
+
+// fetch data (returns a promise)
+fetch(dataEndpoint)
+  .then(messydata => messydata.json())
+  .then(cleandata => countries.push(...cleandata)) // spread each individual argument into the push method
+  // -!!!- pushing cleandata into countries array without the dots gives an Array of array(nested array)
+
+function findWord(wordToMatch, countries) {
+  // return the filtered array
+  return countries.filter(object => {
+    // return the country that matches the typed word
+    // return object.name.match(/mara/i)
+    const regex = new RegExp(wordToMatch, 'gi');
+    return object.name.match(regex); // returns all the arrays that have the word typed in it
+  });
+}
+
+function displayMatchedCountries() {
+  // console.log(this.value); - display the typed value
+  // use the findWord() func to find the word typed
+  const matchedValues = findWord(this.value, countries);
+  console.log(matchedValues); // returns an array with matched countries
+
+  // loop through that array of objects and display it
+  const html = matchedValues.map(object => {
+    // highlight the searched word using replace (normal to highlighted)
+    const regex = new RegExp(this.value, 'gi'); // select the value typed
+    const countryName = object.name.replace(regex, `<span class="hl">${this.value}</span>`);
+    return `
+      <li>
+        <span class="name">${countryName}</span>
+        <span class="dial_code"> dial code: ${object.dial_code}</span>
+      </li>
+    `;
+  }).join('');
+  suggestions.innerHTML = html;
+}
+
+// selections
+const searchInput = document.querySelector('input.search'); // select the input
+const suggestions = document.querySelector('.matchedCountries'); // select the ul
+console.log(suggestions);
+
+searchInput.addEventListener('change', displayMatchedCountries); // is trigered only when typing and clicking outside
+searchInput.addEventListener('keyup', displayMatchedCountries); // is trigered when you release the key
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</script>
+  </body>
+</html>
